@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- We resume the logic in empty_world.launch, changing only Atom One Darkthe name of the world to be launched -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+<!--    <arg name="world_name" value="$(find cdpr_uav_ddrive)/worlds/multi_drone_logger6_changePos.world"/>-->
+    <!--测试pwm-->
+   <!-- <arg name="world_name" value="$(find cdpr_uav_ddrive)/worlds/testPWM.world"/> -->
+   <!-- 测试频率 -->
+   <!--<arg name="world_name" value="$(find cdpr_uav_ddrive)/worlds/test_hz_no_iris.world"/>-->
+<!--    小车话题共用一个-->
+<!--    <arg name="world_name" value="$(find cdpr_uav_ddrive)/worlds/testLoggerOnetopic.world"/>-->
+
+    <arg name="world_name" value="$(find cdpr_uav_ddrive)/worlds/experiment3drone.world"/>
+    <!-- <arg name="world_name" value="$(find cdpr_uav_ddrive)/worlds/experiment2dBigAverage.world"/> -->
+<!--    <arg name="world_name" value="$(find cdpr_uav_ddrive)/worlds/experiment2dNOTAverage.world"/>-->
+<!--    <arg name="world_name" value="$(find cdpr_uav_ddrive)/worlds/experiment2dSmallAverage.world"/>-->
+    <!-- more default parameters can be changed here -->
+    <param name="/use_sim_time" value="false" />
+  </include>
+
+</launch>
