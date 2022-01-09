@@ -12,8 +12,7 @@
 
     <arg name="world_name" value="$(find cdpr_uav_ddrive)/worlds/experiment3drone.world"/>
     <!-- <arg name="world_name" value="$(find cdpr_uav_ddrive)/worlds/experiment2dBigAverage.world"/> -->
-<!--    <arg name="world_name" value="$(find cdpr_uav_ddrive)/worlds/experiment2dNOTAverage.world"/>-->
-<!--    <arg name="world_name" value="$(find cdpr_uav_ddrive)/worlds/experiment2dSmallAverage.world"/>-->
+   <!-- <arg name="world_name" value="$(find cdpr_uav_ddrive)/worlds/experiment2dSmallAverage.world"/> -->
     <!-- more default parameters can be changed here -->
     <param name="/use_sim_time" value="false" />
   </include>
