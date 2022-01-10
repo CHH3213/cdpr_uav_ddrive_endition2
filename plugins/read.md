@@ -1,10 +1,7 @@
-testforce_plugin_logger1.cc:调好了一个小车的插件,吊运物体是立方体
-testforce_plugin_origin.cc:最初xugenyuan那复制来的插件
-force_plugin_backup.cc:小车部分已经修改好了的插件，吊运物体是立方体
-force_plugin_backup2.cc:额外添加了一个无人机的插件，吊运物体还是立方体
-force_plugin_backup_smallcone.cc:吊运物体为小圆锥，无人机的插件与小车的一样
-force_plugin_backup_drone1tanli.cc:吊运物体为小圆锥，无人机拉力为弹力，只有一架无人机有拉力，其他还没写
-force_plugin.cc:目前正在使用的插件，吊运物体是圆锥
-force_plugin_loggerOneTopic.cc:所有小车的力用一个话题发布
-force_plugin_testPWM.cc :测试PWM和频率相关的插件
-force_noiris_testPWM.cc :测试PWM和频率相关的插件,没有无人机
+## 插件解释
+- force_plugin_loggerOneTopic_2uav.cc:所有小车的力的话题用同一个发布，两架无人机分别发送力的话题
+- force_plugin_loggerOneTopic.cc:所有小车的力的话题用同一个发布，3架无人机分别发送力的话题
+- force_plugin_testPWM.cc :测试PWM和频率相关的插件
+
+如何书写插件可参考：[gazebo插件使用详细步骤](https://blog.csdn.net/weixin_42301220/article/details/116057005)
+

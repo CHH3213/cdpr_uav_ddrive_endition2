@@ -26,6 +26,7 @@ cp cdpr_uav_ddrive_endition2 cdpr_uav_ddrive
 
   ```bash
   chmod a+x start_multi_drone.sh
+  chmod a+x ardupilot.sh
   ```
 
 
@@ -37,15 +38,31 @@ cp cdpr_uav_ddrive_endition2 cdpr_uav_ddrive
 
 - 打开环境，正常打开后应该会有如下界面：
 
-<img src="./worlds/fig/env3.png" alt="world" style="zoom:150%;" />
+  <img src="./worlds/fig/env3.png" alt="world" style="zoom:150%;" />
+
+- 如果在运行bash脚本后仿真环境无法正常工作，则依次打开不同终端手动运行：
+  ```bash
+  roslaunch cdpr_uav_ddrive multi_drone.launch
+  ./start_multi_drone.sh
+  roslaunch cdpr_uav_ddrive multi-apm.launch
+  ```
 
 
+## launch文件夹说明
+- `apm.launch`:单架无人机下的mavros开启
+- `multi-apm.launch`:多架无人机下的mavros开启（默认开启三架）
+- `multi_drone.launch`：仿真环境launch文件
 
-
-
+## bash文件夹说明
+- `reset_params.sh`和`rc_multi_drone.sh`是修改`rc/override`的，在这里未用到。
+- `multi-ardupilot.sh`：开启软件在环仿真（SITL）
+- `start_multi_drone.sh`：是整个项目运行的脚本
 ## 运行
 
-在`scripts`文件夹下，主要的main函数有`experi_2dBA`,`experi_2dNOTA`,`experi_2dSA`,`experi_3drone`分别表示2架无人机大间距，两架无人机无间距，两架无人机小间距，3架无人机。需要分别打开对应的环境才可以运行。
+在`scripts`文件夹下，主要的main函数有`experi_2dBA`,`experi_2dSA`,`experi_3drone`分别表示2架无人机大间距，两架无人机无间距，两架无人机小间距，3架无人机。需要分别打开对应的环境才可以运行(在`multi_drone.launch`文件中切换)。
 - 首先运行`cmd_force.py`
-- 而后运行相应的main函数
+- 而后运行相应的main函数：
+  - `experi_2dBA.py`:2架无人机大间距下的实验主程序
+  - `experi_2dSA.py`:2架无人机小间距下的实验主程序
+  - `experi_3drone.py`:3架无人机下的实验主程序
 
