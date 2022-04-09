@@ -574,6 +574,7 @@ class CDPR(gym.Env):
                          force_logger2=self.force_logger2, force_logger3=self.force_logger3,
                          force_loggerAll=self.target_loggerAll,
                          pwm2thrust1 = self.pwm2thrust1,pwm2thrust2=self.pwm2thrust2,pwm2thrust3=self.pwm2thrust3))
+        # 计算力看看符合不符合要求
         targetForcex = np.mean([self.target_loggerAll[i][0] for i in range(count_draw-100,count_draw)])
         targetForcey = np.mean([self.target_loggerAll[i][1] for i in range(count_draw-100,count_draw)])
         targetForcez = np.mean([self.target_loggerAll[i][2] for i in range(count_draw-100,count_draw)])

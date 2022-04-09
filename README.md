@@ -31,7 +31,7 @@ cp cdpr_uav_ddrive_endition2 cdpr_uav_ddrive
 
 
 - 运行bash脚本，正常可以打开环境：
-
+  （作者的环境需要在`tftorch`虚拟环境下运行。）
   ```
   ./start_multi_drone.sh
   ```
@@ -43,7 +43,7 @@ cp cdpr_uav_ddrive_endition2 cdpr_uav_ddrive
 - 如果在运行bash脚本后仿真环境无法正常工作，则依次打开不同终端手动运行：
   ```bash
   roslaunch cdpr_uav_ddrive multi_drone.launch
-  ./start_multi_drone.sh
+  ./start_multi_drone.sh  # 注释掉该文件里的两行lanuch命令。
   roslaunch cdpr_uav_ddrive multi-apm.launch
   ```
 
