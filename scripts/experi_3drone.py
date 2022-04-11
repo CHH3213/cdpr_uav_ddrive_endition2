@@ -104,8 +104,7 @@ class CDPR(gym.Env):
         # # 物理属性
         self.cable_length = 5
         self.payload_gravity = 0.25*9.8
-        self.drone_gravity = 18.88
-        self.Coeff_elasticity = 4
+        self.drone_gravity = 10
         # 数据保存
         self.state_logger0 = []
         self.state_logger1 = []
@@ -152,7 +151,7 @@ class CDPR(gym.Env):
 
 
 
-        self.saveData_dir = "/home/chh3213/ros_wc/src/cdpr_uav_ddrive/scripts/Data"
+        self.saveData_dir = "../scripts/Data"
         if not os.path.exists(self.saveData_dir):
             os.makedirs(self.saveData_dir)
 
@@ -355,7 +354,7 @@ class CDPR(gym.Env):
         multiarray6 = Float32MultiArray()
         self.target_z = 3.00
         target = [0, 0, self.target_z]
-        self.altitude = 9.22
+        self.altitude = 16.33
         self.Coeff_elasticity = 2
         pid = apmPID(target)
         # vehicle = connect('127.0.0.1:14551', wait_ready=True)
@@ -423,10 +422,10 @@ class CDPR(gym.Env):
             [self.drone1_position, _, _, _] = self.get_state(self.model_states, model_name[4])
             [self.drone2_position, _, _, _] = self.get_state(self.model_states, model_name[5])
             [self.drone3_position, _, _, _] = self.get_state(self.model_states, model_name[6])
-            if(count_draw>100):
-                self.drone1_position[2]=self.altitude-(self.target_z-self.payload_position[2])
-                self.drone2_position[2]=self.altitude-(self.target_z-self.payload_position[2])
-                self.drone3_position[2]=self.altitude-(self.target_z-self.payload_position[2])
+            # if(count_draw>100):
+            #     self.drone1_position[2]=self.altitude-(self.target_z-self.payload_position[2])
+            #     self.drone2_position[2]=self.altitude-(self.target_z-self.payload_position[2])
+            #     self.drone3_position[2]=self.altitude-(self.target_z-self.payload_position[2])
             delta_load2drone1_ = [self.payload_position[0] - self.drone1_position[0],
                                   self.payload_position[1] - self.drone1_position[1],
                                   self.payload_position[2] - self.drone1_position[2]]
@@ -534,7 +533,7 @@ class CDPR(gym.Env):
                 plt.plot(self.data_droneforce2)
                 plt.plot(self.data_droneforce3)
                 plt.legend(labels=['logger0', 'logger1', 'logger2', 'logger3', 'drone1', 'drone2', 'drone3'],loc='best')
-                plt.savefig('/home/chh3213/ros_wc/src/cdpr_uav_ddrive/scripts/Data/figures/force_3d.png')
+                plt.savefig('../scripts/Data/figures/force_3d.png')
                 count_draw = 1
                 plt.figure(2)
                 plt.title('PayloadPos_multi')
@@ -544,14 +543,14 @@ class CDPR(gym.Env):
                 plt.axhline(y=target[2], color='r', linestyle='-')
                 plt.axhline(y=target[0], color='r', linestyle='-')
                 plt.legend(labels=['pos_x', 'pos_y', 'pos_z'], loc='best')
-                plt.savefig('/home/chh3213/ros_wc/src/cdpr_uav_ddrive/scripts/Data/figures/PayloadPos_3d.png')
+                plt.savefig('../scripts/Data/figures/PayloadPos_3d.png')
                 plt.figure(3)
                 plt.title('drone_pos')
                 plt.plot(self.dataPosz_drone1)
                 plt.plot(self.dataPosz_drone2)
                 plt.plot(self.dataPosz_drone3)
                 plt.axhline(y=self.altitude, color='r', linestyle='-')
-                plt.savefig('/home/chh3213/ros_wc/src/cdpr_uav_ddrive/scripts/Data/figures/DronePos_3d.png')
+                plt.savefig('../scripts/Data/figures/DronePos_3d.png')
                 # plt.show()
                 running.data = False
                 self.run_cmd_pub.publish(running)
@@ -616,9 +615,9 @@ class CDPR(gym.Env):
         [self.drone1_position, ori_drone1, _, _] = self.get_state(self.model_states, model_name[4])
         [self.drone2_position, ori_drone2, _, _] = self.get_state(self.model_states, model_name[5])
         [self.drone3_position, ori_drone3, _, _] = self.get_state(self.model_states, model_name[6])
-        self.drone1_position[2] = self.altitude-(self.target_z-self.payload_position[2])
-        self.drone2_position[2]=self.altitude-(self.target_z-self.payload_position[2])
-        self.drone3_position[2]=self.altitude-(self.target_z-self.payload_position[2])
+        # self.drone1_position[2] = self.altitude-(self.target_z-self.payload_position[2])
+        # self.drone2_position[2]=self.altitude-(self.target_z-self.payload_position[2])
+        # self.drone3_position[2]=self.altitude-(self.target_z-self.payload_position[2])
         # 负载与小车间的力的方向,指向小车
         delta_load2logger0 = [self.logger0_position[0] - self.payload_position[0],
                               self.logger0_position[1] - self.payload_position[1],

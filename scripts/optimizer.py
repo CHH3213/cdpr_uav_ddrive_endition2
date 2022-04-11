@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.optimize import minimize
 from scipy.optimize import least_squares
+import numba
 
 
 def fun(args):
@@ -31,7 +32,7 @@ def con1(args):
             )
     return cons
 
-
+# @numba.jit
 def minimizeForce(allArgs):
     # target_forceLogger0123, force_dir0, force_dir1,force_dir2,force_dir3 = allArgs
     # 力的下限是大于0,因为是小车的拉力，方向指向小车

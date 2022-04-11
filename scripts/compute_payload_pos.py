@@ -65,12 +65,12 @@ def con():
 
 def minimizeForce(pos_drones, gravity_payload, target_cables_force, Coeff_elasticity):
     cons = con()
-    x0=np.array([0,0,6])
+    x0=np.array([0,0,3])
     res = minimize(compute_pos(pos_drones, gravity_payload, target_cables_force,
                    Coeff_elasticity), x0, method="SLSQP", constraints=cons, options={'disp':True})
     pos = res.x
     result = res.fun
-    print("pos", pos)
+    print("负载位置：", pos)
     print('result', result)
     print(res.success)
     return pos
@@ -80,16 +80,16 @@ def minimizeForce(pos_drones, gravity_payload, target_cables_force, Coeff_elasti
 if __name__ == '__main__':
     # l = [np.array([1,2,3]),np.array([2,2,2]),np.array([3,3,3])]
     # print(l+np.array([0,0,1]))
+    """通过调整无人机位置来使得解出来的负载位置固定在目标位置上,如这里的目标位置是【0,0,3】"""
+    pos_drones = np.array([[-8,0,20.03],[8,0,20.03]]) # 大间距
+    # pos_drones = np.array([[-0.5,0,20.5],[0.5,0,20.5]]) # 小间距
+    # pos_drones = np.array([[0.0,0.5774,16.33],[-0.5,-0.2887,16.33],[0.5,-0.2887,16.33]]) # 3uavs小间距
 
-    # pos_drones = np.array([[-8,0,7.18],[8,0,7.18]]) # 大间距
-    # pos_drones = np.array([[-0.5,0,9.85],[0.5,0,9.85]]) # 小间距
-    pos_drones = np.array([[0.0,0.5774,9.22],[-0.5,-0.2887,9.22],[0.5,-0.2887,9.22]]) # 3uavs小间距
-
-    gravity_payload = 0  #2.45
-    target_cables_force = np.array([0,0,7.45])
+    gravity_payload = 0  #2.45  赋为0，不需要，合力是所有小车的合力
+    target_cables_force = np.array([0,0,50])
     Coeff_elasticity = 2
     pos = minimizeForce(pos_drones, gravity_payload, target_cables_force, Coeff_elasticity)
 
-    # pos_payload = np.array([0,0,4.84])
+    # pos_payload = np.array([0,0,3])
     pos_payload = np.array(pos)
     compute_pos2(pos_drones, gravity_payload, pos_payload, target_cables_force, Coeff_elasticity)
