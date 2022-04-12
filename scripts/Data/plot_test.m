@@ -1,7 +1,8 @@
 clc;
 clear;
 % load('2');
-load('20220411/3uav/3droneData_v8.mat');
+load('20220412/3uav/3droneData_v8.mat');
+% load('20220412/2uav/2droneSAData.mat');
 figure();
 plot(state_drone1(:,1,3));
 hold on;

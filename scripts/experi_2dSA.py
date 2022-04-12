@@ -2,6 +2,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 from __future__ import print_function, absolute_import, division
+import copy
 import gym
 import numpy
 import time
@@ -367,8 +368,8 @@ class CDPR(gym.Env):
             # Override1 = OverrideRCIn()
             # Override1.channels = [1800, 1700, 1800, 1800, 1500, 1600, 1500, 1500]
             # self.rc_override1.publish(Override1.channels)
-            print('channels1', self.rc_states1.channels)
-            print('channels2', self.rc_states2.channels)
+            # print('channels1', self.rc_states1.channels)
+            # print('channels2', self.rc_states2.channels)
             # print('channels3', self.rc_states3.channels)
             # print('channelsRCIn1', self.rcIn_states1.channels)
             # print('channelsRCIn2', self.rcIn_states2.channels)
@@ -394,12 +395,31 @@ class CDPR(gym.Env):
             [self.payload_position, _, self.payload_linear, _] = self.get_state(self.model_states, model_name[7])
             [self.drone1_position, _, _, _] = self.get_state(self.model_states, model_name[4])
             [self.drone2_position, _, _, _] = self.get_state(self.model_states, model_name[5])
+
+            
             # if count_draw>100:
             #     self.drone1_position[2] = self.altitude-(self.target_z-self.payload_position[2])
             #     self.drone2_position[2] = self.altitude-(self.target_z-self.payload_position[2])
-                # [self.drone1_position, self.drone2_position, ori_drone1, ori_drone2] = self.get_posByMavros()
+            # [self.drone1_position, self.drone2_position, ori_drone1, ori_drone2] = self.get_posByMavros()
             # print('d1',self.drone1_position)
             # print('d2',self.drone2_position)
+            """=================保存数据所用================"""
+            d1_pos_save = copy.deepcopy(self.drone1_position)
+            d2_pos_save = copy.deepcopy(self.drone2_position)
+            if count_draw > 100:
+                d1_pos_save[2] = self.altitude-(self.target_z-self.payload_position[2])
+                d2_pos_save[2] = self.altitude-(self.target_z-self.payload_position[2])
+            delta_load2d1_save = [self.payload_position[0] - d1_pos_save[0],
+                                  self.payload_position[1] - d1_pos_save[1],
+                                  self.payload_position[2] - d1_pos_save[2]]
+            delta_load2d2_save = [self.payload_position[0] - d2_pos_save[0],
+                                  self.payload_position[1] - d2_pos_save[1],
+                                  self.payload_position[2] - d2_pos_save[2]]
+            d_c1 = np.sqrt(np.sum(np.square(delta_load2d1_save)))
+            d_c2 = np.sqrt(np.sum(np.square(delta_load2d2_save)))
+            self.cabledrone1_save = self.Coeff_elasticity * (d_c1 - 1-4)
+            self.cabledrone2_save = self.Coeff_elasticity * (d_c2 - 1-4)
+            """==================================================="""
             delta_load2drone1_ = [self.payload_position[0] - self.drone1_position[0],
                                 self.payload_position[1] - self.drone1_position[1],
                                 self.payload_position[2] - self.drone1_position[2]]
@@ -571,10 +591,11 @@ class CDPR(gym.Env):
         [self.logger2_position, _, _, _] = self.get_state(self.model_states, model_name[2])
         [self.logger3_position, _, _, _] = self.get_state(self.model_states, model_name[3])
         # 使用mavros获取无人机位置信息
-        [self.drone1_position, self.drone2_position, ori_drone1, ori_drone2] = self.get_posByMavros()
         [self.drone1_position_mav, self.drone2_position_mav, ori_drone1, ori_drone2] = self.get_posByMavros()
-        # [self.drone1_position, ori_drone1, _, _] = self.get_state(self.model_states, model_name[4])
-        # [self.drone2_position, ori_drone2, _, _] = self.get_state(self.model_states, model_name[5])
+        # self.drone1_position, self.drone2_position = self.drone1_position_mav, self.drone2_position_mav
+
+        [self.drone1_position, ori_drone1, _, _] = self.get_state(self.model_states, model_name[4])
+        [self.drone2_position, ori_drone2, _, _] = self.get_state(self.model_states, model_name[5])
         # print("drone1_position",self.drone1_position)
         # self.drone1_position[2]=self.altitude-(self.target_z-self.payload_position[2])
         # self.drone2_position[2]=self.altitude-(self.target_z-self.payload_position[2])
@@ -620,6 +641,9 @@ class CDPR(gym.Env):
         force_cableDrone1 = -np.abs(cableForce1) * delta_load2drone1
         force_cableDrone2 = -np.abs(cableForce2) * delta_load2drone2
 
+        """===保存数据使用==========="""
+        f_cableDrone1_save = -np.abs(self.cabledrone1_save) * delta_load2drone1
+        f_cableDrone2_save = -np.abs(self.cabledrone2_save) * delta_load2drone1
 
         self.force_cable1 = np.abs(cableForce1)
         self.force_cable2 = np.abs(cableForce2)
@@ -674,8 +698,8 @@ class CDPR(gym.Env):
         # print('drone2', self.drone2_position[2])
         # print('+++++++++++++++++++++++++++++')
         # 保存力的数据 向量
-        self.cable_drone1.append(force_cableDrone1)  # 绳子拉力
-        self.cable_drone2.append(force_cableDrone2)
+        self.cable_drone1.append(f_cableDrone1_save)  # 绳子拉力
+        self.cable_drone2.append(f_cableDrone2_save)
         self.thrust_drone1.append(thrust_drone1)  # 无人机推力
         self.thrust_drone2.append(thrust_drone2)
         self.force_logger0.append(force_valueLogger0 * delta_load2logger0)  # 小车拉力
