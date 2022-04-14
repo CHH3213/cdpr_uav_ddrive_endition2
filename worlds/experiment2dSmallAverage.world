@@ -747,7 +747,7 @@
         </velocity_decay>
         <inertial>
           <pose>0 0 0 0 -0 0</pose>
-          <mass>0.6</mass>
+          <mass>0.5</mass>
           <inertia>
             <ixx>0.008</ixx>
             <ixy>0</ixy>
@@ -1493,7 +1493,7 @@
         </velocity_decay>
         <inertial>
           <pose>0 0 0 0 -0 0</pose>
-          <mass>0.6</mass>
+          <mass>0.5</mass>
           <inertia>
             <ixx>0.008</ixx>
             <ixy>0</ixy>

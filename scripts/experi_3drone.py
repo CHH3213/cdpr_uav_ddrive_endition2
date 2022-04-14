@@ -73,7 +73,7 @@ from gazebo_msgs.srv import SetModelState, GetModelState  # 设置模型状态�
 from gazebo_msgs.msg import ModelState, ModelStates
 from gazebo_msgs.srv import *
 from geometry_msgs.msg import Pose, Twist
-
+import copy
 
 class CDPR(gym.Env):
     def __init__(self):
@@ -104,7 +104,7 @@ class CDPR(gym.Env):
         # # 物理属性
         self.cable_length = 5
         self.payload_gravity = 0.25*9.8
-        self.drone_gravity = 10
+        self.drone_gravity = 6
         # 数据保存
         self.state_logger0 = []
         self.state_logger1 = []
@@ -354,8 +354,9 @@ class CDPR(gym.Env):
         multiarray6 = Float32MultiArray()
         self.target_z = 3.00
         target = [0, 0, self.target_z]
-        self.altitude = 16.33
-        self.Coeff_elasticity = 2
+        self.altitude = 12.16
+        # self.altitude = 16.33
+        self.Coeff_elasticity = 4
         pid = apmPID(target)
         # vehicle = connect('127.0.0.1:14551', wait_ready=True)
         self.start = time.time()
@@ -422,10 +423,36 @@ class CDPR(gym.Env):
             [self.drone1_position, _, _, _] = self.get_state(self.model_states, model_name[4])
             [self.drone2_position, _, _, _] = self.get_state(self.model_states, model_name[5])
             [self.drone3_position, _, _, _] = self.get_state(self.model_states, model_name[6])
-            if(count_draw>100):
-                self.drone1_position[2]=self.altitude-(self.target_z-self.payload_position[2])
-                self.drone2_position[2]=self.altitude-(self.target_z-self.payload_position[2])
-                self.drone3_position[2]=self.altitude-(self.target_z-self.payload_position[2])
+            # [self.drone1_position, self.drone2_position, self.drone3_position, _,_,_] = self.get_posByMavros()
+
+            # if(count_draw>100):
+            #     self.drone1_position[2]=self.altitude-(self.target_z-self.payload_position[2])
+            #     self.drone2_position[2]=self.altitude-(self.target_z-self.payload_position[2])
+            #     self.drone3_position[2]=self.altitude-(self.target_z-self.payload_position[2])
+            
+            d1_pos_save = copy.deepcopy(self.drone1_position)
+            d2_pos_save = copy.deepcopy(self.drone2_position)
+            d3_pos_save = copy.deepcopy(self.drone3_position)
+            if count_draw > 100:
+                d1_pos_save[2] = self.altitude-(self.target_z-self.payload_position[2])
+                d2_pos_save[2] = self.altitude-(self.target_z-self.payload_position[2])
+                d3_pos_save[2] = self.altitude-(self.target_z-self.payload_position[2])
+            delta_load2d1_save = [self.payload_position[0] - d1_pos_save[0],
+                                  self.payload_position[1] - d1_pos_save[1],
+                                  self.payload_position[2] - d1_pos_save[2]]
+            delta_load2d2_save = [self.payload_position[0] - d2_pos_save[0],
+                                  self.payload_position[1] - d2_pos_save[1],
+                                  self.payload_position[2] - d2_pos_save[2]]
+            delta_load2d3_save = [self.payload_position[0] - d3_pos_save[0],
+                                  self.payload_position[1] - d3_pos_save[1],
+                                  self.payload_position[2] - d3_pos_save[2]]
+            d_c1 = np.sqrt(np.sum(np.square(delta_load2d1_save)))
+            d_c2 = np.sqrt(np.sum(np.square(delta_load2d2_save)))
+            d_c3 = np.sqrt(np.sum(np.square(delta_load2d3_save)))
+            self.cabledrone1_save = self.Coeff_elasticity * (d_c1 - 1-4)
+            self.cabledrone2_save = self.Coeff_elasticity * (d_c2 - 1-4)
+            self.cabledrone3_save = self.Coeff_elasticity * (d_c3 - 1-4)
+            
             delta_load2drone1_ = [self.payload_position[0] - self.drone1_position[0],
                                   self.payload_position[1] - self.drone1_position[1],
                                   self.payload_position[2] - self.drone1_position[2]]
@@ -616,8 +643,8 @@ class CDPR(gym.Env):
         [self.drone2_position, ori_drone2, _, _] = self.get_state(self.model_states, model_name[5])
         [self.drone3_position, ori_drone3, _, _] = self.get_state(self.model_states, model_name[6])
         # self.drone1_position[2] = self.altitude-(self.target_z-self.payload_position[2])
-        # self.drone2_position[2]=self.altitude-(self.target_z-self.payload_position[2])
-        # self.drone3_position[2]=self.altitude-(self.target_z-self.payload_position[2])
+        # self.drone2_position[2]= self.altitude-(self.target_z-self.payload_position[2])
+        # self.drone3_position[2]= self.altitude-(self.target_z-self.payload_position[2])
         # 负载与小车间的力的方向,指向小车
         delta_load2logger0 = [self.logger0_position[0] - self.payload_position[0],
                               self.logger0_position[1] - self.payload_position[1],
@@ -667,6 +694,10 @@ class CDPR(gym.Env):
         # print('force_cabledrone1', force_cableDrone1)
         # print('force_cabledrone2', force_cableDrone2)
         # print('force_cabledrone3', force_cableDrone3)
+        """===保存数据使用==========="""
+        f_cableDrone1_save = -np.abs(self.cabledrone1_save) * delta_load2drone1
+        f_cableDrone2_save = -np.abs(self.cabledrone2_save) * delta_load2drone2
+        f_cableDrone3_save = -np.abs(self.cabledrone3_save) * delta_load2drone3
 
         self.force_cable1 = np.abs(cableForce1)
         self.force_cable2 = np.abs(cableForce2)
@@ -679,10 +710,11 @@ class CDPR(gym.Env):
         thrust_drone1 = np.array([matrix1[0][2], matrix1[1][2], matrix1[2][2]])*self.thrust1
         thrust_drone2 = np.array([matrix2[0][2], matrix2[1][2], matrix2[2][2]])*self.thrust2
         thrust_drone3 = np.array([matrix3[0][2], matrix3[1][2], matrix3[2][2]])* self.thrust3
-        # real_cable_force1 = thrust_drone1 + [0,0, -drone_gravity]
-        # real_cable_force2 = thrust_drone2 + [0,0, -drone_gravity]
-        # # print('real_cable_force1', real_cable_force1)
-        # # print('real_cable_force2', real_cable_force2)
+
+        real_cable_force1 = thrust_drone1 + [0,0, -drone_gravity]
+        real_cable_force2 = thrust_drone2 + [0,0, -drone_gravity]
+        print('real_cable_force1', real_cable_force1)
+        print('real_cable_force2', real_cable_force2)
         # cos_theta = np.sum([a*b for a ,b in zip(real_cable_force1,delta_load2drone1)])/(np.linalg.norm(real_cable_force1))
         # print('theta', cos_theta)
         # pid
@@ -702,6 +734,8 @@ class CDPR(gym.Env):
         # value = force_valueLogger0 * delta_load2logger0 + force_valueLogger1 * delta_load2logger1 + force_valueLogger2 * delta_load2logger2 + force_valueLogger3 * delta_load2logger3 - target_forceLogger0123
         # if self.payload_linear[2]<0:
         print('===========================')
+        print('force_cabledrone1', force_cableDrone1)
+        print('force_cabledrone2', force_cableDrone2)
         # print('value', value)
         # print('force_cable', self.force_cable1, self.force_cable2)
         print('force_pid', force_pid)
@@ -719,9 +753,12 @@ class CDPR(gym.Env):
         # print('thrust3',thrust_drone3)
         # print('+++++++++++++++++++++++++++++')
         # 保存力的数据 向量
-        self.cable_drone1.append(force_cableDrone1)  # 绳子拉力
-        self.cable_drone2.append(force_cableDrone2)
-        self.cable_drone3.append(force_cableDrone3)
+        # self.cable_drone1.append(force_cableDrone1)  # 绳子拉力
+        # self.cable_drone2.append(force_cableDrone2)
+        # self.cable_drone3.append(force_cableDrone3)
+        self.cable_drone1.append(f_cableDrone1_save)  # 绳子拉力
+        self.cable_drone2.append(f_cableDrone2_save)
+        self.cable_drone3.append(f_cableDrone3_save)
         self.thrust_drone1.append(thrust_drone1)  # 无人机推力
         self.thrust_drone2.append(thrust_drone2)
         self.thrust_drone3.append(thrust_drone3)

@@ -100,8 +100,8 @@ class CDPR(gym.Env):
         # # 物理属性
         self.cable_length = 5
         self.payload_gravity = 0.25*9.8
-        self.drone_gravity = 10
-        self.Coeff_elasticity = 4
+        self.drone_gravity = 5
+        self.Coeff_elasticity = 2
         # 数据保存
         self.state_logger0 = []
         self.state_logger1 = []
@@ -328,8 +328,9 @@ class CDPR(gym.Env):
 
         self.target_z = 3
         target = [0, 0, self.target_z]
-        self.Coeff_elasticity = 2
-        self.altitude = 20.5
+        self.Coeff_elasticity = 4
+        # self.altitude = 20.5
+        self.altitude = 14.25
         pid = apmPID(target)
         # vehicle = connect('127.0.0.1:14551', wait_ready=True)
         self.start = time.time()
@@ -643,7 +644,7 @@ class CDPR(gym.Env):
 
         """===保存数据使用==========="""
         f_cableDrone1_save = -np.abs(self.cabledrone1_save) * delta_load2drone1
-        f_cableDrone2_save = -np.abs(self.cabledrone2_save) * delta_load2drone1
+        f_cableDrone2_save = -np.abs(self.cabledrone2_save) * delta_load2drone2
 
         self.force_cable1 = np.abs(cableForce1)
         self.force_cable2 = np.abs(cableForce2)
@@ -655,6 +656,8 @@ class CDPR(gym.Env):
         # 推力向量
         thrust_drone1 = np.array([matrix1[0][2], matrix1[1][2], matrix1[2][2]])*self.thrust1
         thrust_drone2 = np.array([matrix2[0][2], matrix2[1][2], matrix2[2][2]])*self.thrust2
+        # thrust_drone1 = thrust_drone1 + [0,0,-2]
+        # thrust_drone2 = thrust_drone2 + [0,0,-2]
         real_cable_force1 = thrust_drone1 + [0, 0, -drone_gravity]
         real_cable_force2 = thrust_drone2 + [0, 0, -drone_gravity]
         print('real_cable_force1', real_cable_force1)
