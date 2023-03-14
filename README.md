@@ -1,6 +1,7 @@
 # cdpr_uav_ddrive
 
-> 2021/12/30
+> This is the final source code for "On the Optimal Energy Efficiency of the Multi-Rotor UAVs of an Aerial Cable Towed Robot".
+> ref link: https://www.sciencedirect.com/science/article/abs/pii/S0094114X22002531
 
 ## Environments
 - 整个环境是在`apm`飞控下运行成功的。所以在运行本环境之前，需要安装好mavros和apm，[Intelligent Quads Tutorials](https://github.com/Intelligent-Quads/iq_tutorials)
